@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python To'liq Qo'llanma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --border: #30363d;
+    --border2: #21262d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --green: #56d364;
+    --green2: #3fb950;
+    --green-dim: #1a2e1a;
+    --blue: #79c0ff;
+    --purple: #d2a8ff;
+    --orange: #ffa657;
+    --red: #ff7b72;
+    --yellow: #e3b341;
+    --comment: #8b949e;
+    --radius: 8px;
+    --radius-sm: 4px;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
+    --sidebar-w: 260px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--bg2);
+    border-right: 1px solid var(--border2);
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .logo-prompt {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .logo-prompt span {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .cursor-blink {
+    width: 8px; height: 14px;
+    background: var(--green);
+    display: inline-block;
+    animation: blink 1.1s step-end infinite;
+    border-radius: 1px;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 5px;
+    font-family: var(--font-mono);
+  }
+
+  .nav-group { padding: 12px 0 4px; }
+
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+    user-select: none;
+    text-decoration: none;
+  }
+
+  .nav-item:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .nav-item.active {
+    color: var(--green);
+    border-left-color: var(--green);
+    background: var(--green-dim);
+  }
+
+  .nav-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    min-width: 18px;
+  }
+
+  .nav-item.active .nav-num { color: var(--green2); }
+
+  /* ===== MAIN ===== */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 60px 48px 48px;
+    border-bottom: 1px solid var(--border2);
+    background: linear-gradient(180deg, #0f1923 0%, var(--bg) 100%);
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green2);
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-size: 42px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .hero-title .accent { color: var(--green); }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--text2);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 32px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat { }
+
+  .stat-num {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .content {
+    padding: 0;
+  }
+
+  .section {
+    display: none;
+    padding: 40px 48px;
+    border-bottom: 1px solid var(--border2);
+    animation: fadeIn 0.2s ease;
+  }
+
+  .section.active { display: block; }
+
+  .home-section {
+    display: none;
+    padding: 40px 48px;
+  }
+
+  .home-section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--green2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.7;
+    max-width: 580px;
+    margin-bottom: 28px;
+  }
+
+  /* ===== CODE BLOCK ===== */
+  .code-wrap {
+    position: relative;
+    margin: 20px 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .code-header {
+    background: var(--bg3);
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .code-lang-badge::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); border-color: var(--text3); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  .code-body {
+    background: #0d1117;
+    padding: 20px 20px;
+    overflow-x: auto;
+  }
+
+  .code-body pre {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+    tab-size: 4;
+  }
+
+  /* Syntax colors */
+  .kw  { color: var(--red); }
+  .fn  { color: var(--purple); }
+  .str { color: var(--blue); }
+  .cm  { color: var(--comment); font-style: italic; }
+  .num { color: var(--blue); }
+  .op  { color: var(--red); }
+  .var { color: var(--orange); }
+  .bi  { color: var(--blue); }
+  .dec { color: var(--green); }
+
+  /* ===== CARDS ===== */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .card:hover {
+    border-color: var(--border);
+    background: var(--bg3);
+    transform: translateY(-2px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .card-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+  }
+
+  .badge-green { background: var(--green-dim); color: var(--green); }
+  .badge-blue  { background: #0d2137; color: var(--blue); }
+  .badge-purple{ background: #1e1433; color: var(--purple); }
+  .badge-orange{ background: #2a1e0d; color: var(--orange); }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.55;
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: var(--border2);
+    margin: 28px 0;
+  }
+
+  /* ===== NOTE ===== */
+  .note {
+    background: var(--green-dim);
+    border: 1px solid #1e4d1e;
+    border-left: 3px solid var(--green);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    margin: 16px 0;
+  }
+
+  .note strong { color: var(--green); }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hero, .section, .home-section { padding: 24px 20px; }
+    .hero-title { font-size: 28px; }
+    .hero-stats { gap: 20px; }
+    .mobile-toggle {
+      display: flex !important;
+      position: fixed; top: 14px; left: 14px;
+      z-index: 200;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      cursor: pointer;
+      color: var(--text);
+    }
+  }
+
+  .mobile-toggle { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-prompt">&gt;&gt;&gt; <span>python_uz</span><span class="cursor-blink"></span></div>
+    <div class="logo-sub">To'liq qo'llanma · 22 bo'lim</div>
+  </div>
+
+  <nav>
+    <div class="nav-group">
+      <div class="nav-group-label">Kirish</div>
+      <div class="nav-item active" onclick="show('home',this)"><span class="nav-num">~</span>Bosh sahifa</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Asoslar</div>
+      <div class="nav-item" onclick="show('variables',this)"><span class="nav-num">01</span>O'zgaruvchilar</div>
+      <div class="nav-item" onclick="show('strings',this)"><span class="nav-num">02</span>String metodlari</div>
+      <div class="nav-item" onclick="show('list',this)"><span class="nav-num">03</span>List</div>
+      <div class="nav-item" onclick="show('dict',this)"><span class="nav-num">04</span>Dictionary</div>
+      <div class="nav-item" onclick="show('tuple',this)"><span class="nav-num">05</span>Tuple & Set</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Mantiq</div>
+      <div class="nav-item" onclick="show('conditions',this)"><span class="nav-num">06</span>Shartlar</div>
+      <div class="nav-item" onclick="show('loops',this)"><span class="nav-num">07</span>Sikllar</div>
+      <div class="nav-item" onclick="show('functions',this)"><span class="nav-num">08</span>Funksiyalar</div>
+      <div class="nav-item" onclick="show('oop',this)"><span class="nav-num">09</span>OOP</div>
+      <div class="nav-item" onclick="show('errors',this)"><span class="nav-num">10</span>Xatolar</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Modullar</div>
+      <div class="nav-item" onclick="show('files',this)"><span class="nav-num">11</span>Fayl ishlash</div>
+      <div class="nav-item" onclick="show('json',this)"><span class="nav-num">12</span>JSON</div>
+      <div class="nav-item" onclick="show('datetime',this)"><span class="nav-num">13</span>DateTime</div>
+      <div class="nav-item" onclick="show('math',this)"><span class="nav-num">14</span>Math & Random</div>
+      <div class="nav-item" onclick="show('regex',this)"><span class="nav-num">15</span>Regex</div>
+      <div class="nav-item" onclick="show('sqlite',this)"><span class="nav-num">16</span>SQLite</div>
+      <div class="nav-item" onclick="show('requests',this)"><span class="nav-num">17</span>Requests</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Ilg'or</div>
+      <div class="nav-item" onclick="show('async',this)"><span class="nav-num">18</span>Asyncio</div>
+      <div class="nav-item" onclick="show('threading',this)"><span class="nav-num">19</span>Threading</div>
+      <div class="nav-item" onclick="show('itertools',this)"><span class="nav-num">20</span>Itertools</div>
+      <div class="nav-item" onclick="show('typing',this)"><span class="nav-num">21</span>Typing</div>
+      <div class="nav-item" onclick="show('collections',this)"><span class="nav-num">22</span>Collections</div>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow"># python to'liq qo'llanma · uzbekcha</div>
+    <h1 class="hero-title">Python'ni <span class="accent">to'liq</span><br>o'rgan</h1>
+    <p class="hero-desc">Asoslardan tortib ilg'or mavzulargacha — barcha kod misollar, izohlar bilan. O'zbek tilida.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">22</div><div class="stat-label">Bo'lim</div></div>
+      <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Kod misoli</div></div>
+      <div class="stat"><div class="stat-num">35+</div><div class="stat-label">Modul</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="home-section active" id="sec-home">
+      <div class="cards">
+        <div class="card" onclick="show('variables',null)">
+          <div class="card-top"><span class="card-badge badge-green">01</span></div>
+          <div class="card-title">O'zgaruvchilar</div>
+          <div class="card-desc">int, float, str, bool, None — asosiy turlar va tur o'zgartirish</div>
+        </div>
+        <div class="card" onclick="show('strings',null)">
+          <div class="card-top"><span class="card-badge badge-green">02</span></div>
+          <div class="card-title">String metodlari</div>
+          <div class="card-desc">50+ metod, formatlash, slicing, encode/decode</div>
+        </div>
+        <div class="card" onclick="show('list',null)">
+          <div class="card-top"><span class="card-badge badge-green">03</span></div>
+          <div class="card-title">List</div>
+          <div class="card-desc">append, sort, comprehension, zip, map, filter</div>
+        </div>
+        <div class="card" onclick="show('dict',null)">
+          <div class="card-top"><span class="card-badge badge-green">04</span></div>
+          <div class="card-title">Dictionary</div>
+          <div class="card-desc">get, update, items, defaultdict, Counter</div>
+        </div>
+        <div class="card" onclick="show('functions',null)">
+          <div class="card-top"><span class="card-badge badge-blue">08</span></div>
+          <div class="card-title">Funksiyalar</div>
+          <div class="card-desc">*args, **kwargs, lambda, decorator, generator</div>
+        </div>
+        <div class="card" onclick="show('oop',null)">
+          <div class="card-top"><span class="card-badge badge-blue">09</span></div>
+          <div class="card-title">OOP</div>
+          <div class="card-desc">class, meros, abstract, dataclass, magic methods</div>
+        </div>
+        <div class="card" onclick="show('sqlite',null)">
+          <div class="card-top"><span class="card-badge badge-purple">16</span></div>
+          <div class="card-title">SQLite</div>
+          <div class="card-desc">Ma'lumotlar bazasi bilan ishlash</div>
+        </div>
+        <div class="card" onclick="show('async',null)">
+          <div class="card-top"><span class="card-badge badge-orange">18</span></div>
+          <div class="card-title">Asyncio</div>
+          <div class="card-desc">Asinxron dasturlash, await, gather, task</div>
+        </div>
+        <div class="card" onclick="show('requests',null)">
+          <div class="card-top"><span class="card-badge badge-purple">17</span></div>
+          <div class="card-title">Requests</div>
+          <div class="card-desc">GET, POST, headers, session, fayl yuborish</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 01: VARIABLES -->
+    <div class="section" id="sec-variables">
+      <div class="section-eyebrow">01 · Asoslar</div>
+      <h2 class="section-title">O'zgaruvchilar va turlar</h2>
+      <p class="section-desc">Python'da o'zgaruvchilar e'lon qilish shart emas — qiymat berilganda avtomatik yaratiladi.</p>
+      <div class="code-wrap">
+        <div class="code-header">
+          <span class="code-lang-badge">python</span>
+          <button class="copy-btn" onclick="copyCode(this)">Nusxa</button>
+        </div>
+        <div class="code-body"><pre><span class="cm"># Asosiy turlar</span>
+<span class="var">x</span>       <span class="op">=</span> <span class="num">10</span>          <span class="cm"># int</span>
+<span class="var">y</span>       <span class="op">=</span> <span class="num">3.14</span>        <span class="cm"># float</span>
+<span class="var">ism</span>     <span class="op">=</span> <span class="str">"Ali"</span>       <span class="cm"># str</span>
+<span class="var">aktiv</span>   <span class="op">=</span> <span class="kw">True</span>        <span class="cm"># bool</span>
+<span class="var">nothing</span> <span class="op">=</span> <span class="kw">None</span>        <span class="cm"># NoneType</span>
+
+<span class="cm"># Tur aniqlash</span>
+<span class="bi">type</span>(<span class="var">x</span>)               <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="bi">isinstance</span>(<span class="var">x</span>, <span class="bi">int</span>)   <span class="cm"># True</span>
+
+<span class="cm"># Tur o'zgartirish</span>
+<span class="bi">int</span>(<span class="str">"42"</span>)             <span class="cm"># 42</span>
+<span class="bi">float</span>(<span class="str">"3.14"</span>)         <span class="cm"># 3.14</span>
+<span class="bi">str</span>(<span class="num">100</span>)              <span class="cm"># "100"</span>
+<span class="bi">bool</span>(<span class="num">0</span>)               <span class="cm"># False</span>
+<span class="bi">list</span>(<span class="str">"abc"</span>)           <span class="cm"># ['a', 'b', 'c']</span>
+<span class="bi">tuple</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])        <span class="cm"># (1, 2, 3)</span>
+<span class="bi">set</span>([<span class="num">1</span>,<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])       <span class="cm"># {1, 2, 3}</span>
+
+<span class="cm"># Ko'p qiymat bir vaqtda</span>
+<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+<span class="var">x</span> <span class="op">=</span> <span class="var">y</span> <span class="op">=</span> <span class="var">z</span> <span class="op">=</span> <span class="num">0</span>
+
+<span class="cm"># Konstantalar (konventsiya)</span>
+<span class="var">PI</span>       <span class="op">=</span> <span class="num">3.14159</span>
+<span class="var">MAX_SIZE</span> <span class="op">=</span> <span class="num">100</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 02: STRINGS -->
+    <div class="section" id="sec-strings">
+      <div class="section-eyebrow">02 · Asoslar</div>
+      <h2 class="section-title">String metodlari</h2>
+      <p class="section-desc">Stringlar o'zgarmas (immutable). Barcha metodlar yangi string qaytaradi. 50+ metod mavjud.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="var">s</span> <span class="op">=</span> <span class="str">"Salom Dunyo"</span>
+
+<span class="var">s</span>.<span class="fn">upper</span>()                     <span class="cm"># "SALOM DUNYO"</span>
+<span class="var">s</span>.<span class="fn">lower</span>()                     <span class="cm"># "salom dunyo"</span>
+<span class="var">s</span>.<span class="fn">strip</span>()                     <span class="cm"># bo'shliqlarni olib tashlash</span>
+<span class="var">s</span>.<span class="fn">replace</span>(<span class="str">"Salom"</span>, <span class="str">"Hi"</span>)     <span class="cm"># "Hi Dunyo"</span>
+<span class="var">s</span>.<span class="fn">split</span>(<span class="str">" "</span>)                 <span class="cm"># ["Salom", "Dunyo"]</span>
+<span class="str">" "</span>.<span class="fn">join</span>([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>])      <span class="cm"># "a b c"</span>
+<span class="var">s</span>.<span class="fn">find</span>(<span class="str">"Dunyo"</span>)              <span class="cm"># 6</span>
+<span class="var">s</span>.<span class="fn">count</span>(<span class="str">"l"</span>)                 <span class="cm"># 1</span>
+<span class="var">s</span>.<span class="fn">startswith</span>(<span class="str">"Sal"</span>)          <span class="cm"># True</span>
+<span class="var">s</span>.<span class="fn">isdigit</span>()                   <span class="cm"># False</span>
+<span class="var">s</span>.<span class="fn">isalpha</span>()                   <span class="cm"># False</span>
+
+<span class="cm"># Kesish (slicing)</span>
+<span class="var">s</span>[<span class="num">0</span>:<span class="num">5</span>]      <span class="cm"># "Salom"</span>
+<span class="var">s</span>[<span class="num">6</span>:]       <span class="cm"># "Dunyo"</span>
+<span class="var">s</span>[::<span class="op">-</span><span class="num">1</span>]    <span class="cm"># "oynoD molaS"</span>
+
+<span class="cm"># F-string formatlash</span>
+<span class="var">ism</span>, <span class="var">yosh</span> <span class="op">=</span> <span class="str">"Ali"</span>, <span class="num">25</span>
+<span class="kw">f</span><span class="str">"Ismim {ism}, yoshim {yosh}"</span>
+<span class="kw">f</span><span class="str">"{3.14159:.2f}"</span>               <span class="cm"># "3.14"</span>
+<span class="kw">f</span><span class="str">"{1000000:,}"</span>                 <span class="cm"># "1,000,000"</span>
+<span class="kw">f</span><span class="str">"{0.75:.0%}"</span>                  <span class="cm"># "75%"</span>
+<span class="kw">f</span><span class="str">"{ism:^20}"</span>                   <span class="cm"># markazga</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 03: LIST -->
+    <div class="section" id="sec-list">
+      <div class="section-eyebrow">03 · Asoslar</div>
+      <h2 class="section-title">List (ro'yxat)</h2>
+      <p class="section-desc">Python'ning eng ko'p ishlatiladigan ma'lumot tuzilmasi. O'zgaruvchan (mutable).</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="var">lst</span> <span class="op">=</span> [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>, <span class="num">9</span>]
+
+<span class="cm"># Qo'shish</span>
+<span class="var">lst</span>.<span class="fn">append</span>(<span class="num">7</span>)            <span class="cm"># oxiriga</span>
+<span class="var">lst</span>.<span class="fn">insert</span>(<span class="num">0</span>, <span class="num">0</span>)         <span class="cm"># indeksga</span>
+<span class="var">lst</span>.<span class="fn">extend</span>([<span class="num">10</span>, <span class="num">11</span>])    <span class="cm"># ro'yxat qo'shish</span>
+
+<span class="cm"># O'chirish</span>
+<span class="var">lst</span>.<span class="fn">remove</span>(<span class="num">1</span>)            <span class="cm"># birinchi 1 ni</span>
+<span class="var">lst</span>.<span class="fn">pop</span>()                <span class="cm"># oxirgisini</span>
+<span class="var">lst</span>.<span class="fn">pop</span>(<span class="num">0</span>)              <span class="cm"># indeks bo'yicha</span>
+
+<span class="cm"># Saralash</span>
+<span class="var">lst</span>.<span class="fn">sort</span>()               <span class="cm"># kichikdan kattaga</span>
+<span class="var">lst</span>.<span class="fn">sort</span>(reverse<span class="op">=</span><span class="kw">True</span>)  <span class="cm"># kattadan kichikka</span>
+<span class="bi">sorted</span>(<span class="var">lst</span>)             <span class="cm"># yangi saralangan</span>
+
+<span class="cm"># Ma'lumot</span>
+<span class="bi">len</span>(<span class="var">lst</span>)  <span class="bi">min</span>(<span class="var">lst</span>)  <span class="bi">max</span>(<span class="var">lst</span>)  <span class="bi">sum</span>(<span class="var">lst</span>)
+
+<span class="cm"># List comprehension</span>
+[<span class="var">x</span><span class="op">**</span><span class="num">2</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>)]
+[<span class="var">x</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">20</span>) <span class="kw">if</span> <span class="var">x</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span>]
+
+<span class="cm"># Zip, Enumerate, Map, Filter</span>
+<span class="bi">list</span>(<span class="bi">zip</span>([<span class="num">1</span>,<span class="num">2</span>], [<span class="str">"a"</span>,<span class="str">"b"</span>]))           <span class="cm"># [(1,'a'),(2,'b')]</span>
+<span class="bi">list</span>(<span class="bi">enumerate</span>([<span class="str">"a"</span>,<span class="str">"b"</span>]))           <span class="cm"># [(0,'a'),(1,'b')]</span>
+<span class="bi">list</span>(<span class="bi">map</span>(<span class="kw">lambda</span> <span class="var">x</span>: <span class="var">x</span><span class="op">*</span><span class="num">2</span>, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]))   <span class="cm"># [2, 4, 6]</span>
+<span class="bi">list</span>(<span class="bi">filter</span>(<span class="kw">lambda</span> <span class="var">x</span>: <span class="var">x</span><span class="op">></span><span class="num">2</span>, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>]))<span class="cm"># [3, 4]</span>
+
+<span class="cm"># Unpack</span>
+<span class="var">first</span>, <span class="op">*</span><span class="var">rest</span> <span class="op">=</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]</pre></div>
+      </div>
+    </div>
+
+    <!-- 04: DICT -->
+    <div class="section" id="sec-dict">
+      <div class="section-eyebrow">04 · Asoslar</div>
+      <h2 class="section-title">Dictionary (lug'at)</h2>
+      <p class="section-desc">Kalit-qiymat juftliklari. Python 3.7+ da qo'shilish tartibi saqlanadi.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="var">d</span> <span class="op">=</span> {<span class="str">"ism"</span>: <span class="str">"Ali"</span>, <span class="str">"yosh"</span>: <span class="num">25</span>}
+
+<span class="var">d</span>[<span class="str">"ism"</span>]                        <span class="cm"># "Ali"</span>
+<span class="var">d</span>.<span class="fn">get</span>(<span class="str">"telefon"</span>, <span class="str">"yo'q"</span>)      <span class="cm"># "yo'q"</span>
+<span class="var">d</span>.<span class="fn">keys</span>()   <span class="var">d</span>.<span class="fn">values</span>()   <span class="var">d</span>.<span class="fn">items</span>()
+<span class="var">d</span>.<span class="fn">update</span>({<span class="str">"yosh"</span>: <span class="num">26</span>})
+<span class="var">d</span>.<span class="fn">pop</span>(<span class="str">"yosh"</span>)
+<span class="kw">del</span> <span class="var">d</span>[<span class="str">"ism"</span>]
+
+<span class="cm"># Dict comprehension</span>
+{<span class="var">k</span>: <span class="var">v</span><span class="op">*</span><span class="num">2</span> <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> {<span class="str">"a"</span>:<span class="num">1</span>, <span class="str">"b"</span>:<span class="num">2</span>}.<span class="fn">items</span>()}
+
+<span class="cm"># Birlashtirish</span>
+<span class="var">d3</span> <span class="op">=</span> {<span class="op">**</span><span class="var">d1</span>, <span class="op">**</span><span class="var">d2</span>}    <span class="cm"># Python 3.5+</span>
+<span class="var">d4</span> <span class="op">=</span> <span class="var">d1</span> <span class="op">|</span> <span class="var">d2</span>         <span class="cm"># Python 3.9+</span>
+
+<span class="cm"># defaultdict — KeyError yo'q</span>
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+<span class="var">dd</span> <span class="op">=</span> <span class="fn">defaultdict</span>(<span class="bi">list</span>)
+<span class="var">dd</span>[<span class="str">"kalit"</span>].<span class="fn">append</span>(<span class="num">1</span>)
+
+<span class="cm"># Counter — elementlarni sanash</span>
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+<span class="var">c</span> <span class="op">=</span> <span class="fn">Counter</span>(<span class="str">"abracadabra"</span>)
+<span class="var">c</span>.<span class="fn">most_common</span>(<span class="num">3</span>)  <span class="cm"># [('a',5), ('b',2), ('r',2)]</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 05: TUPLE SET -->
+    <div class="section" id="sec-tuple">
+      <div class="section-eyebrow">05 · Asoslar</div>
+      <h2 class="section-title">Tuple & Set</h2>
+      <p class="section-desc">Tuple — o'zgarmas ro'yxat. Set — takrorlanmas elementlar to'plami.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="cm"># Tuple — o'zgarmas</span>
+<span class="var">t</span> <span class="op">=</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)
+<span class="var">x</span>, <span class="var">y</span>, <span class="var">z</span> <span class="op">=</span> <span class="var">t</span>           <span class="cm"># unpack</span>
+<span class="var">a</span>, <span class="op">*</span><span class="var">b</span> <span class="op">=</span> (<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>)      <span class="cm"># a=1, b=[2,3,4]</span>
+
+<span class="cm"># Named tuple</span>
+<span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+<span class="var">Point</span> <span class="op">=</span> <span class="fn">namedtuple</span>(<span class="str">"Point"</span>, [<span class="str">"x"</span>, <span class="str">"y"</span>])
+<span class="var">p</span> <span class="op">=</span> <span class="var">Point</span>(<span class="num">10</span>, <span class="num">20</span>)
+<span class="var">p</span>.<span class="var">x</span>  <span class="cm"># 10</span>
+
+<span class="cm"># Set — takrorlanmas to'plam</span>
+<span class="var">s1</span> <span class="op">=</span> {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+<span class="var">s2</span> <span class="op">=</span> {<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>}
+
+<span class="var">s1</span> <span class="op">|</span> <span class="var">s2</span>   <span class="cm"># birlashma  → {1,2,3,4,5,6}</span>
+<span class="var">s1</span> <span class="op">&amp;</span> <span class="var">s2</span>   <span class="cm"># kesishma   → {3,4}</span>
+<span class="var">s1</span> <span class="op">-</span> <span class="var">s2</span>   <span class="cm"># ayirma     → {1,2}</span>
+<span class="var">s1</span> <span class="op">^</span> <span class="var">s2</span>   <span class="cm"># sim.ayirma → {1,2,5,6}</span>
+
+<span class="cm"># Dublikatlarni olib tashlash</span>
+<span class="var">unique</span> <span class="op">=</span> <span class="bi">list</span>(<span class="bi">set</span>([<span class="num">1</span>,<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>]))
+
+<span class="cm"># Set comprehension</span>
+{<span class="var">x</span><span class="op">**</span><span class="num">2</span> <span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>)}</pre></div>
+      </div>
+    </div>
+
+    <!-- 06: CONDITIONS -->
+    <div class="section" id="sec-conditions">
+      <div class="section-eyebrow">06 · Mantiq</div>
+      <h2 class="section-title">Shartlar</h2>
+      <p class="section-desc">if/elif/else, ternary operator va Python 3.10+ match-case.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="var">x</span> <span class="op">=</span> <span class="num">10</span>
+
+<span class="kw">if</span> <span class="var">x</span> <span class="op">&gt;</span> <span class="num">0</span>:
+    <span class="bi">print</span>(<span class="str">"Musbat"</span>)
+<span class="kw">elif</span> <span class="var">x</span> <span class="op">&lt;</span> <span class="num">0</span>:
+    <span class="bi">print</span>(<span class="str">"Manfiy"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="str">"Nol"</span>)
+
+<span class="cm"># Ternary — bir qatorli shart</span>
+<span class="var">natija</span> <span class="op">=</span> <span class="str">"katta"</span> <span class="kw">if</span> <span class="var">x</span> <span class="op">&gt;</span> <span class="num">5</span> <span class="kw">else</span> <span class="str">"kichik"</span>
+
+<span class="cm"># Mantiqiy operatorlar</span>
+<span class="kw">True</span> <span class="kw">and</span> <span class="kw">False</span>   <span class="cm"># False</span>
+<span class="kw">True</span> <span class="kw">or</span>  <span class="kw">False</span>   <span class="cm"># True</span>
+<span class="kw">not</span> <span class="kw">True</span>         <span class="cm"># False</span>
+
+<span class="cm"># Zanjirli taqqoslash</span>
+<span class="num">1</span> <span class="op">&lt;</span> <span class="var">x</span> <span class="op">&lt;</span> <span class="num">20</span>        <span class="cm"># True</span>
+
+<span class="cm"># match-case (Python 3.10+)</span>
+<span class="kw">match</span> <span class="var">rang</span>:
+    <span class="kw">case</span> <span class="str">"qizil"</span>:   <span class="bi">print</span>(<span class="str">"Stop"</span>)
+    <span class="kw">case</span> <span class="str">"yashil"</span>:  <span class="bi">print</span>(<span class="str">"Yuring"</span>)
+    <span class="kw">case</span> _:          <span class="bi">print</span>(<span class="str">"Noma'lum"</span>)</pre></div>
+      </div>
+    </div>
+
+    <!-- 07: LOOPS -->
+    <div class="section" id="sec-loops">
+      <div class="section-eyebrow">07 · Mantiq</div>
+      <h2 class="section-title">Sikllar</h2>
+      <p class="section-desc">for, while, break, continue, pass va else in loop.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">5</span>):            <span class="cm"># 0,1,2,3,4</span>
+    <span class="bi">print</span>(<span class="var">i</span>)
+
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">0</span>, <span class="num">10</span>, <span class="num">2</span>):     <span class="cm"># 0,2,4,6,8</span>
+    <span class="bi">print</span>(<span class="var">i</span>)
+
+<span class="kw">for</span> <span class="var">i</span>, <span class="var">val</span> <span class="kw">in</span> <span class="bi">enumerate</span>([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>]):
+    <span class="bi">print</span>(<span class="var">i</span>, <span class="var">val</span>)
+
+<span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> {<span class="str">"a"</span>:<span class="num">1</span>}.<span class="fn">items</span>():
+    <span class="bi">print</span>(<span class="var">k</span>, <span class="var">v</span>)
+
+<span class="cm"># While</span>
+<span class="var">i</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">while</span> <span class="var">i</span> <span class="op">&lt;</span> <span class="num">5</span>:
+    <span class="bi">print</span>(<span class="var">i</span>)
+    <span class="var">i</span> <span class="op">+=</span> <span class="num">1</span>
+
+<span class="cm"># break / continue / pass</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>):
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">5</span>: <span class="kw">break</span>         <span class="cm"># sikldan chiqish</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span>: <span class="kw">continue</span>  <span class="cm"># keyingiga o'tish</span>
+    <span class="bi">print</span>(<span class="var">i</span>)
+
+<span class="cm"># else in loop (break bo'lmasa ishlaydi)</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="num">5</span>):
+    <span class="bi">print</span>(<span class="var">i</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="str">"Sikl tugadi"</span>)</pre></div>
+      </div>
+    </div>
+
+    <!-- 08: FUNCTIONS -->
+    <div class="section" id="sec-functions">
+      <div class="section-eyebrow">08 · Mantiq</div>
+      <h2 class="section-title">Funksiyalar</h2>
+      <p class="section-desc">def, *args, **kwargs, lambda, decorator, closure, generator — barchasi shu yerda.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">def</span> <span class="fn">salom</span>(<span class="var">ism</span><span class="op">=</span><span class="str">"Foydalanuvchi"</span>):
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"Salom, {ism}!"</span>)
+
+<span class="kw">def</span> <span class="fn">yigindi</span>(<span class="op">*</span><span class="var">sonlar</span>):           <span class="cm"># istalgan argumentlar</span>
+    <span class="kw">return</span> <span class="bi">sum</span>(<span class="var">sonlar</span>)
+
+<span class="kw">def</span> <span class="fn">info</span>(<span class="op">**</span><span class="var">kwargs</span>):               <span class="cm"># kalit argumentlar</span>
+    <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="var">kwargs</span>.<span class="fn">items</span>():
+        <span class="bi">print</span>(<span class="kw">f</span><span class="str">"{k}: {v}"</span>)
+
+<span class="cm"># Lambda</span>
+<span class="var">kvadrat</span> <span class="op">=</span> <span class="kw">lambda</span> <span class="var">x</span>: <span class="var">x</span><span class="op">**</span><span class="num">2</span>
+
+<span class="cm"># Decorator</span>
+<span class="kw">def</span> <span class="fn">dekorator</span>(<span class="var">func</span>):
+    <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span><span class="var">args</span>, <span class="op">**</span><span class="var">kwargs</span>):
+        <span class="bi">print</span>(<span class="str">"Oldin"</span>)
+        <span class="kw">return</span> <span class="var">func</span>(<span class="op">*</span><span class="var">args</span>, <span class="op">**</span><span class="var">kwargs</span>)
+    <span class="kw">return</span> <span class="var">wrapper</span>
+
+<span class="dec">@dekorator</span>
+<span class="kw">def</span> <span class="fn">mening_funksiyam</span>():
+    <span class="bi">print</span>(<span class="str">"Ishlayapti!"</span>)
+
+<span class="cm"># Generator</span>
+<span class="kw">def</span> <span class="fn">gen</span>(<span class="var">n</span>):
+    <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span>(<span class="var">n</span>):
+        <span class="kw">yield</span> <span class="var">i</span>
+
+<span class="cm"># lru_cache — kesh</span>
+<span class="kw">from</span> functools <span class="kw">import</span> lru_cache
+
+<span class="dec">@lru_cache</span>(maxsize<span class="op">=</span><span class="num">128</span>)
+<span class="kw">def</span> <span class="fn">fib</span>(<span class="var">n</span>):
+    <span class="kw">if</span> <span class="var">n</span> <span class="op">&lt;</span> <span class="num">2</span>: <span class="kw">return</span> <span class="var">n</span>
+    <span class="kw">return</span> <span class="fn">fib</span>(<span class="var">n</span><span class="op">-</span><span class="num">1</span>) <span class="op">+</span> <span class="fn">fib</span>(<span class="var">n</span><span class="op">-</span><span class="num">2</span>)</pre></div>
+      </div>
+    </div>
+
+    <!-- 09: OOP -->
+    <div class="section" id="sec-oop">
+      <div class="section-eyebrow">09 · Mantiq</div>
+      <h2 class="section-title">OOP — Obyektga yo'naltirilgan</h2>
+      <p class="section-desc">class, __init__, meros, @property, @classmethod, @staticmethod, dataclass.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">class</span> <span class="fn">Inson</span>:
+    <span class="var">tur</span> <span class="op">=</span> <span class="str">"Homo sapiens"</span>     <span class="cm"># class atribut</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">ism</span>, <span class="var">yosh</span>):
+        <span class="var">self</span>.<span class="var">ism</span>  <span class="op">=</span> <span class="var">ism</span>
+        <span class="var">self</span>.<span class="var">yosh</span> <span class="op">=</span> <span class="var">yosh</span>
+
+    <span class="kw">def</span> <span class="fn">salomlash</span>(<span class="var">self</span>):
+        <span class="bi">print</span>(<span class="kw">f</span><span class="str">"Men {self.ism}!"</span>)
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">info</span>(<span class="var">self</span>):
+        <span class="kw">return</span> <span class="kw">f</span><span class="str">"{self.ism} ({self.yosh})"</span>
+
+    <span class="dec">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">yaratish</span>(<span class="var">cls</span>, <span class="var">matn</span>):
+        <span class="var">ism</span>, <span class="var">yosh</span> <span class="op">=</span> <span class="var">matn</span>.<span class="fn">split</span>(<span class="str">","</span>)
+        <span class="kw">return</span> <span class="var">cls</span>(<span class="var">ism</span>.<span class="fn">strip</span>(), <span class="bi">int</span>(<span class="var">yosh</span>))
+
+<span class="cm"># Meros</span>
+<span class="kw">class</span> <span class="fn">Talaba</span>(<span class="fn">Inson</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="var">self</span>, <span class="var">ism</span>, <span class="var">yosh</span>, <span class="var">guruh</span>):
+        <span class="bi">super</span>().<span class="fn">__init__</span>(<span class="var">ism</span>, <span class="var">yosh</span>)
+        <span class="var">self</span>.<span class="var">guruh</span> <span class="op">=</span> <span class="var">guruh</span>
+
+<span class="cm"># Dataclass</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="fn">Mahsulot</span>:
+    <span class="var">nom</span>:    <span class="bi">str</span>
+    <span class="var">narx</span>:   <span class="bi">float</span>
+    <span class="var">miqdor</span>: <span class="bi">int</span> <span class="op">=</span> <span class="num">1</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 10: ERRORS -->
+    <div class="section" id="sec-errors">
+      <div class="section-eyebrow">10 · Mantiq</div>
+      <h2 class="section-title">Xatolarni boshqarish</h2>
+      <p class="section-desc">try/except/else/finally, o'z Exception yaratish, assert.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">try</span>:
+    <span class="var">son</span> <span class="op">=</span> <span class="bi">int</span>(<span class="bi">input</span>(<span class="str">"Son: "</span>))
+    <span class="var">natija</span> <span class="op">=</span> <span class="num">10</span> <span class="op">/</span> <span class="var">son</span>
+<span class="kw">except</span> ValueError:
+    <span class="bi">print</span>(<span class="str">"Raqam kiriting"</span>)
+<span class="kw">except</span> ZeroDivisionError:
+    <span class="bi">print</span>(<span class="str">"Nol kiritmang"</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> <span class="var">e</span>:
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"Xato: {e}"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"Natija: {natija}"</span>)  <span class="cm"># xato bo'lmasa</span>
+<span class="kw">finally</span>:
+    <span class="bi">print</span>(<span class="str">"Har doim ishlaydi"</span>)
+
+<span class="cm"># O'z xatosi</span>
+<span class="kw">class</span> <span class="fn">MeningXatom</span>(Exception):
+    <span class="kw">pass</span>
+
+<span class="kw">raise</span> <span class="fn">MeningXatom</span>(<span class="str">"Xato yuz berdi!"</span>)
+
+<span class="cm"># Asosiy xato turlari:</span>
+<span class="cm"># ValueError, TypeError, IndexError</span>
+<span class="cm"># KeyError, AttributeError, NameError</span>
+<span class="cm"># FileNotFoundError, ZeroDivisionError</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 11: FILES -->
+    <div class="section" id="sec-files">
+      <div class="section-eyebrow">11 · Modullar</div>
+      <h2 class="section-title">Fayl bilan ishlash</h2>
+      <p class="section-desc">open(), os, shutil, pathlib — fayllarni o'qish, yozish va boshqarish.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="cm"># Yozish</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"fayl.txt"</span>, <span class="str">"w"</span>, encoding<span class="op">=</span><span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span>:
+    <span class="var">f</span>.<span class="fn">write</span>(<span class="str">"Salom dunyo\n"</span>)
+
+<span class="cm"># O'qish</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"fayl.txt"</span>, <span class="str">"r"</span>, encoding<span class="op">=</span><span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span>:
+    <span class="var">content</span>  <span class="op">=</span> <span class="var">f</span>.<span class="fn">read</span>()        <span class="cm"># hammasi</span>
+    <span class="var">line</span>     <span class="op">=</span> <span class="var">f</span>.<span class="fn">readline</span>()   <span class="cm"># bir qator</span>
+    <span class="var">lines</span>    <span class="op">=</span> <span class="var">f</span>.<span class="fn">readlines</span>()  <span class="cm"># ro'yxat</span>
+
+<span class="cm"># os moduli</span>
+<span class="kw">import</span> os
+<span class="var">os</span>.<span class="fn">getcwd</span>()               <span class="cm"># joriy papka</span>
+<span class="var">os</span>.<span class="fn">listdir</span>(<span class="str">"."</span>)           <span class="cm"># fayllar ro'yxati</span>
+<span class="var">os</span>.<span class="fn">mkdir</span>(<span class="str">"yangi_papka"</span>)   <span class="cm"># papka yaratish</span>
+<span class="var">os</span>.<span class="fn">remove</span>(<span class="str">"fayl.txt"</span>)     <span class="cm"># fayl o'chirish</span>
+<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">exists</span>(<span class="str">"fayl"</span>)    <span class="cm"># mavjudmi?</span>
+<span class="var">os</span>.<span class="fn">path</span>.<span class="fn">join</span>(<span class="str">"a"</span>, <span class="str">"b"</span>)    <span class="cm"># yo'lni birlashtirish</span>
+
+<span class="cm"># pathlib — zamonaviy usul</span>
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="var">p</span> <span class="op">=</span> Path(<span class="str">"fayl.txt"</span>)
+<span class="var">p</span>.<span class="fn">read_text</span>(encoding<span class="op">=</span><span class="str">"utf-8"</span>)
+<span class="var">p</span>.<span class="fn">write_text</span>(<span class="str">"Salom"</span>)
+<span class="bi">list</span>(Path(<span class="str">"."</span>).<span class="fn">glob</span>(<span class="str">"*.py"</span>))   <span class="cm"># .py fayllar</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 12: JSON -->
+    <div class="section" id="sec-json">
+      <div class="section-eyebrow">12 · Modullar</div>
+      <h2 class="section-title">JSON</h2>
+      <p class="section-desc">json.dumps, json.loads, json.dump, json.load — to'liq o'qish va yozish.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> json
+
+<span class="var">data</span> <span class="op">=</span> {<span class="str">"ism"</span>: <span class="str">"Ali"</span>, <span class="str">"yosh"</span>: <span class="num">25</span>, <span class="str">"mevalar"</span>: [<span class="str">"olma"</span>]}
+
+<span class="cm"># Python → JSON string</span>
+<span class="var">s</span> <span class="op">=</span> json.<span class="fn">dumps</span>(<span class="var">data</span>)
+<span class="var">s</span> <span class="op">=</span> json.<span class="fn">dumps</span>(<span class="var">data</span>, indent<span class="op">=</span><span class="num">4</span>, ensure_ascii<span class="op">=</span><span class="kw">False</span>)
+
+<span class="cm"># JSON string → Python</span>
+<span class="var">obj</span> <span class="op">=</span> json.<span class="fn">loads</span>(<span class="var">s</span>)
+
+<span class="cm"># Faylga yozish</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"data.json"</span>, <span class="str">"w"</span>, encoding<span class="op">=</span><span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span>:
+    json.<span class="fn">dump</span>(<span class="var">data</span>, <span class="var">f</span>, indent<span class="op">=</span><span class="num">4</span>, ensure_ascii<span class="op">=</span><span class="kw">False</span>)
+
+<span class="cm"># Fayldan o'qish</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"data.json"</span>, <span class="str">"r"</span>, encoding<span class="op">=</span><span class="str">"utf-8"</span>) <span class="kw">as</span> <span class="var">f</span>:
+    <span class="var">data</span> <span class="op">=</span> json.<span class="fn">load</span>(<span class="var">f</span>)</pre></div>
+      </div>
+    </div>
+
+    <!-- 13: DATETIME -->
+    <div class="section" id="sec-datetime">
+      <div class="section-eyebrow">13 · Modullar</div>
+      <h2 class="section-title">DateTime</h2>
+      <p class="section-desc">Sana va vaqt bilan ishlash — datetime, timedelta, strftime, strptime.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+<span class="var">now</span> <span class="op">=</span> datetime.<span class="fn">now</span>()
+<span class="var">now</span>.<span class="var">year</span>   <span class="cm"># 2026</span>
+<span class="var">now</span>.<span class="var">month</span>  <span class="cm"># 6</span>
+<span class="var">now</span>.<span class="var">day</span>    <span class="cm"># 12</span>
+<span class="var">now</span>.<span class="var">hour</span>   <span class="cm"># soat</span>
+
+<span class="cm"># Formatlash</span>
+<span class="var">now</span>.<span class="fn">strftime</span>(<span class="str">"%d.%m.%Y %H:%M"</span>)    <span class="cm"># "12.06.2026 10:30"</span>
+<span class="var">now</span>.<span class="fn">strftime</span>(<span class="str">"%Y-%m-%d"</span>)          <span class="cm"># "2026-06-12"</span>
+
+<span class="cm"># Stringdan yaratish</span>
+datetime.<span class="fn">strptime</span>(<span class="str">"2026-06-12"</span>, <span class="str">"%Y-%m-%d"</span>)
+
+<span class="cm"># Timedelta — vaqt farqi</span>
+<span class="var">erta</span>  <span class="op">=</span> datetime.<span class="fn">now</span>() <span class="op">+</span> timedelta(days<span class="op">=</span><span class="num">1</span>)
+<span class="var">kecha</span> <span class="op">=</span> datetime.<span class="fn">now</span>() <span class="op">-</span> timedelta(days<span class="op">=</span><span class="num">1</span>)
+<span class="var">farq</span>  <span class="op">=</span> datetime(<span class="num">2027</span>,<span class="num">1</span>,<span class="num">1</span>) <span class="op">-</span> datetime.<span class="fn">now</span>()
+<span class="var">farq</span>.<span class="var">days</span>                          <span class="cm"># kunlar soni</span>
+
+<span class="cm"># Unix timestamp</span>
+<span class="kw">import</span> time
+time.<span class="fn">time</span>()                        <span class="cm"># hozirgi timestamp</span>
+datetime.<span class="fn">fromtimestamp</span>(time.<span class="fn">time</span>())</pre></div>
+      </div>
+    </div>
+
+    <!-- 14: MATH -->
+    <div class="section" id="sec-math">
+      <div class="section-eyebrow">14 · Modullar</div>
+      <h2 class="section-title">Math & Random</h2>
+      <p class="section-desc">Matematik funksiyalar, trigonometriya va tasodifiy sonlar.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> math, random
+
+<span class="cm"># math</span>
+math.<span class="fn">sqrt</span>(<span class="num">16</span>)          <span class="cm"># 4.0</span>
+math.<span class="fn">ceil</span>(<span class="num">4.1</span>)         <span class="cm"># 5</span>
+math.<span class="fn">floor</span>(<span class="num">4.9</span>)        <span class="cm"># 4</span>
+math.<span class="fn">factorial</span>(<span class="num">5</span>)      <span class="cm"># 120</span>
+math.<span class="fn">log</span>(<span class="num">100</span>, <span class="num">10</span>)      <span class="cm"># 2.0</span>
+math.<span class="fn">log2</span>(<span class="num">8</span>)           <span class="cm"># 3.0</span>
+math.<span class="fn">sin</span>(math.<span class="var">pi</span><span class="op">/</span><span class="num">2</span>)   <span class="cm"># 1.0</span>
+math.<span class="fn">gcd</span>(<span class="num">12</span>, <span class="num">8</span>)        <span class="cm"># 4</span>
+math.<span class="fn">comb</span>(<span class="num">10</span>, <span class="num">3</span>)       <span class="cm"># 120 kombinatsiya</span>
+math.<span class="var">pi</span>                <span class="cm"># 3.14159...</span>
+math.<span class="var">e</span>                 <span class="cm"># 2.71828...</span>
+
+<span class="cm"># random</span>
+random.<span class="fn">random</span>()            <span class="cm"># 0.0 dan 1.0</span>
+random.<span class="fn">randint</span>(<span class="num">1</span>, <span class="num">100</span>)    <span class="cm"># 1-100 butun son</span>
+random.<span class="fn">uniform</span>(<span class="num">1</span>, <span class="num">10</span>)    <span class="cm"># kasr son</span>
+random.<span class="fn">choice</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])   <span class="cm"># tasodifiy element</span>
+random.<span class="fn">shuffle</span>(<span class="var">lst</span>)       <span class="cm"># aralashtirish</span>
+random.<span class="fn">sample</span>(<span class="var">lst</span>, <span class="num">3</span>)    <span class="cm"># 3 ta takrorlashsiz</span>
+random.<span class="fn">seed</span>(<span class="num">42</span>)           <span class="cm"># natijani qotirish</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 15: REGEX -->
+    <div class="section" id="sec-regex">
+      <div class="section-eyebrow">15 · Modullar</div>
+      <h2 class="section-title">Regex (re moduli)</h2>
+      <p class="section-desc">Matnda pattern qidirish, almashtirish va bo'lish.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> re
+
+<span class="var">matn</span> <span class="op">=</span> <span class="str">"Ali 25 yoshda, tel: +998901234567"</span>
+
+re.<span class="fn">findall</span>(<span class="str">r"\d+"</span>, <span class="var">matn</span>)           <span class="cm"># ['25', '998901234567']</span>
+re.<span class="fn">search</span>(<span class="str">r"\d+"</span>, <span class="var">matn</span>)            <span class="cm"># birinchi topilgan</span>
+re.<span class="fn">sub</span>(<span class="str">r"\d"</span>, <span class="str">"*"</span>, <span class="var">matn</span>)           <span class="cm"># raqamlarni * bilan</span>
+re.<span class="fn">split</span>(<span class="str">r"\s+"</span>, <span class="var">matn</span>)             <span class="cm"># bo'shliq bo'yicha</span>
+re.<span class="fn">match</span>(<span class="str">r"Ali"</span>, <span class="var">matn</span>)             <span class="cm"># boshidan qidirish</span>
+
+<span class="cm"># O'zbek telefon raqami</span>
+re.<span class="fn">findall</span>(<span class="str">r"\+998\d{9}"</span>, <span class="var">matn</span>)
+
+<span class="cm"># Email</span>
+re.<span class="fn">findall</span>(<span class="str">r"[\w.-]+@[\w.-]+\.\w+"</span>, <span class="var">matn</span>)
+
+<span class="cm"># Sana formati</span>
+re.<span class="fn">match</span>(<span class="str">r"^\d{4}-\d{2}-\d{2}$"</span>, <span class="str">"2026-06-12"</span>)
+
+<span class="cm"># Pattern belgilari:</span>
+<span class="cm"># \d  raqam      \D  raqam emas</span>
+<span class="cm"># \w  so'z bel.  \W  so'z emas</span>
+<span class="cm"># \s  bo'shliq   \S  bo'shliq emas</span>
+<span class="cm"># ^   bosh        $  oxir</span>
+<span class="cm"># .   istalgan   *  0+   +  1+   ?  0|1</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 16: SQLITE -->
+    <div class="section" id="sec-sqlite">
+      <div class="section-eyebrow">16 · Modullar</div>
+      <h2 class="section-title">SQLite3</h2>
+      <p class="section-desc">Python ichiga o'rnatilgan ma'lumotlar bazasi. pip o'rnatish shart emas.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> sqlite3
+
+<span class="var">conn</span> <span class="op">=</span> sqlite3.<span class="fn">connect</span>(<span class="str">"baza.db"</span>)      <span class="cm"># fayl</span>
+<span class="var">cur</span>  <span class="op">=</span> <span class="var">conn</span>.<span class="fn">cursor</span>()
+
+<span class="cm"># Jadval yaratish</span>
+<span class="var">cur</span>.<span class="fn">execute</span>(<span class="str">"""
+    CREATE TABLE IF NOT EXISTS users (
+        id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        ism   TEXT NOT NULL,
+        yosh  INTEGER,
+        email TEXT UNIQUE
+    )
+"""</span>)
+<span class="var">conn</span>.<span class="fn">commit</span>()
+
+<span class="cm"># Qo'shish</span>
+<span class="var">cur</span>.<span class="fn">execute</span>(
+    <span class="str">"INSERT INTO users (ism, yosh) VALUES (?, ?)"</span>,
+    (<span class="str">"Ali"</span>, <span class="num">25</span>)
+)
+<span class="var">conn</span>.<span class="fn">commit</span>()
+
+<span class="cm"># O'qish</span>
+<span class="var">cur</span>.<span class="fn">execute</span>(<span class="str">"SELECT * FROM users WHERE yosh &gt; ?"</span>, (<span class="num">20</span>,))
+<span class="var">cur</span>.<span class="fn">fetchall</span>()    <span class="cm"># barchasi</span>
+<span class="var">cur</span>.<span class="fn">fetchone</span>()    <span class="cm"># bitta</span>
+
+<span class="cm"># Yangilash / O'chirish</span>
+<span class="var">cur</span>.<span class="fn">execute</span>(<span class="str">"UPDATE users SET yosh=? WHERE id=?"</span>, (<span class="num">26</span>, <span class="num">1</span>))
+<span class="var">cur</span>.<span class="fn">execute</span>(<span class="str">"DELETE FROM users WHERE id=?"</span>, (<span class="num">1</span>,))
+<span class="var">conn</span>.<span class="fn">commit</span>()
+<span class="var">conn</span>.<span class="fn">close</span>()</pre></div>
+      </div>
+    </div>
+
+    <!-- 17: REQUESTS -->
+    <div class="section" id="sec-requests">
+      <div class="section-eyebrow">17 · Modullar</div>
+      <h2 class="section-title">Requests (HTTP)</h2>
+      <p class="section-desc">Web so'rovlar — GET, POST, headers, session, fayl yuborish.</p>
+      <div class="note"><strong>O'rnatish:</strong> pip install requests</div>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> requests
+
+<span class="cm"># GET</span>
+<span class="var">r</span> <span class="op">=</span> requests.<span class="fn">get</span>(<span class="str">"https://api.example.com/data"</span>)
+<span class="var">r</span>.<span class="var">status_code</span>       <span class="cm"># 200</span>
+<span class="var">r</span>.<span class="fn">json</span>()            <span class="cm"># dict</span>
+<span class="var">r</span>.<span class="var">text</span>              <span class="cm"># string</span>
+<span class="var">r</span>.<span class="var">content</span>           <span class="cm"># bytes</span>
+
+<span class="cm"># Parametrlar bilan</span>
+<span class="var">params</span> <span class="op">=</span> {<span class="str">"page"</span>: <span class="num">1</span>, <span class="str">"limit"</span>: <span class="num">10</span>}
+requests.<span class="fn">get</span>(<span class="str">"https://api.example.com/"</span>, params<span class="op">=</span><span class="var">params</span>)
+
+<span class="cm"># POST — JSON yuborish</span>
+requests.<span class="fn">post</span>(<span class="str">"https://api.example.com/"</span>, json<span class="op">=</span>{<span class="str">"ism"</span>:<span class="str">"Ali"</span>})
+
+<span class="cm"># Auth header</span>
+<span class="var">h</span> <span class="op">=</span> {<span class="str">"Authorization"</span>: <span class="str">"Bearer TOKEN"</span>}
+requests.<span class="fn">get</span>(<span class="str">"https://api.example.com/"</span>, headers<span class="op">=</span><span class="var">h</span>, timeout<span class="op">=</span><span class="num">5</span>)
+
+<span class="cm"># Session</span>
+<span class="var">s</span> <span class="op">=</span> requests.<span class="fn">Session</span>()
+<span class="var">s</span>.<span class="var">headers</span>.<span class="fn">update</span>(<span class="var">h</span>)
+<span class="var">s</span>.<span class="fn">get</span>(<span class="str">"https://api.example.com/data"</span>)
+
+<span class="cm"># Xato tekshirish</span>
+<span class="var">r</span>.<span class="fn">raise_for_status</span>()   <span class="cm"># 4xx/5xx da xato</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 18: ASYNC -->
+    <div class="section" id="sec-async">
+      <div class="section-eyebrow">18 · Ilg'or</div>
+      <h2 class="section-title">Asyncio</h2>
+      <p class="section-desc">Asinxron dasturlash — bir vaqtda ko'p vazifa bajarish. Telegram botlar uchun muhim.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">salom</span>(<span class="var">ism</span>):
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"Salom {ism}"</span>)
+    <span class="kw">await</span> asyncio.<span class="fn">sleep</span>(<span class="num">1</span>)    <span class="cm"># blokirovka qilmaydi</span>
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"{ism} tugadi"</span>)
+
+<span class="cm"># Ishga tushirish</span>
+asyncio.<span class="fn">run</span>(<span class="fn">salom</span>(<span class="str">"Ali"</span>))
+
+<span class="cm"># Bir vaqtda bajarish (gather)</span>
+<span class="kw">async def</span> <span class="fn">asosiy</span>():
+    <span class="kw">await</span> asyncio.<span class="fn">gather</span>(
+        <span class="fn">salom</span>(<span class="str">"Ali"</span>),
+        <span class="fn">salom</span>(<span class="str">"Vali"</span>),
+        <span class="fn">salom</span>(<span class="str">"Soli"</span>)
+    )
+
+<span class="cm"># Task yaratish</span>
+<span class="kw">async def</span> <span class="fn">asosiy</span>():
+    <span class="var">t1</span> <span class="op">=</span> asyncio.<span class="fn">create_task</span>(<span class="fn">salom</span>(<span class="str">"Ali"</span>))
+    <span class="var">t2</span> <span class="op">=</span> asyncio.<span class="fn">create_task</span>(<span class="fn">salom</span>(<span class="str">"Vali"</span>))
+    <span class="kw">await</span> <span class="var">t1</span>
+    <span class="kw">await</span> <span class="var">t2</span>
+
+<span class="cm"># Timeout</span>
+<span class="kw">async def</span> <span class="fn">asosiy</span>():
+    <span class="kw">try</span>:
+        <span class="kw">await</span> asyncio.<span class="fn">wait_for</span>(<span class="fn">salom</span>(<span class="str">"Ali"</span>), timeout<span class="op">=</span><span class="num">2.0</span>)
+    <span class="kw">except</span> asyncio.TimeoutError:
+        <span class="bi">print</span>(<span class="str">"Vaqt tugadi"</span>)</pre></div>
+      </div>
+    </div>
+
+    <!-- 19: THREADING -->
+    <div class="section" id="sec-threading">
+      <div class="section-eyebrow">19 · Ilg'or</div>
+      <h2 class="section-title">Threading</h2>
+      <p class="section-desc">Ko'p oqimli dasturlash — Thread, Lock, ThreadPoolExecutor.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> threading
+<span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+
+<span class="kw">def</span> <span class="fn">vazifa</span>(<span class="var">ism</span>):
+    <span class="bi">print</span>(<span class="kw">f</span><span class="str">"{ism} ishlayapti"</span>)
+
+<span class="cm"># Thread yaratish</span>
+<span class="var">t</span> <span class="op">=</span> threading.<span class="fn">Thread</span>(target<span class="op">=</span><span class="var">vazifa</span>, args<span class="op">=</span>(<span class="str">"Ali"</span>,))
+<span class="var">t</span>.<span class="fn">start</span>()
+<span class="var">t</span>.<span class="fn">join</span>()     <span class="cm"># tugashini kutish</span>
+
+<span class="cm"># Lock — xavfsiz kirish</span>
+<span class="var">lock</span> <span class="op">=</span> threading.<span class="fn">Lock</span>()
+
+<span class="kw">def</span> <span class="fn">xavfsiz_vazifa</span>():
+    <span class="kw">with</span> <span class="var">lock</span>:
+        <span class="cm"># faqat 1 thread kiradi</span>
+        <span class="kw">pass</span>
+
+<span class="cm"># Ko'p thread birdaniga</span>
+<span class="kw">with</span> <span class="fn">ThreadPoolExecutor</span>(max_workers<span class="op">=</span><span class="num">5</span>) <span class="kw">as</span> <span class="var">ex</span>:
+    <span class="var">natijalar</span> <span class="op">=</span> <span class="bi">list</span>(<span class="var">ex</span>.<span class="fn">map</span>(
+        <span class="var">vazifa</span>,
+        [<span class="str">"Ali"</span>, <span class="str">"Vali"</span>, <span class="str">"Soli"</span>]
+    ))</pre></div>
+      </div>
+    </div>
+
+    <!-- 20: ITERTOOLS -->
+    <div class="section" id="sec-itertools">
+      <div class="section-eyebrow">20 · Ilg'or</div>
+      <h2 class="section-title">Itertools</h2>
+      <p class="section-desc">Iteratorlar bilan ishlash — chain, product, combinations, permutations va boshqalar.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">import</span> itertools
+
+<span class="cm"># chain — birlashtirish</span>
+<span class="bi">list</span>(itertools.<span class="fn">chain</span>([<span class="num">1</span>,<span class="num">2</span>], [<span class="num">3</span>,<span class="num">4</span>]))
+<span class="cm"># [1, 2, 3, 4]</span>
+
+<span class="cm"># product — dekart ko'paytmasi</span>
+<span class="bi">list</span>(itertools.<span class="fn">product</span>([<span class="num">1</span>,<span class="num">2</span>], [<span class="str">"a"</span>,<span class="str">"b"</span>]))
+<span class="cm"># [(1,'a'), (1,'b'), (2,'a'), (2,'b')]</span>
+
+<span class="cm"># permutations</span>
+<span class="bi">list</span>(itertools.<span class="fn">permutations</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">2</span>))
+<span class="cm"># [(1,2),(1,3),(2,1),(2,3),(3,1),(3,2)]</span>
+
+<span class="cm"># combinations</span>
+<span class="bi">list</span>(itertools.<span class="fn">combinations</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">2</span>))
+<span class="cm"># [(1,2), (1,3), (2,3)]</span>
+
+<span class="cm"># cycle — aylantirish</span>
+<span class="var">c</span> <span class="op">=</span> itertools.<span class="fn">cycle</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])   <span class="cm"># cheksiz: 1,2,3,1,2,3...</span>
+
+<span class="cm"># islice — kesish</span>
+<span class="bi">list</span>(itertools.<span class="fn">islice</span>(<span class="bi">range</span>(<span class="num">100</span>), <span class="num">5</span>))  <span class="cm"># [0,1,2,3,4]</span>
+
+<span class="cm"># groupby — guruhlash</span>
+<span class="kw">for</span> <span class="var">k</span>, <span class="var">g</span> <span class="kw">in</span> itertools.<span class="fn">groupby</span>([<span class="num">1</span>,<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>]):
+    <span class="bi">print</span>(<span class="var">k</span>, <span class="bi">list</span>(<span class="var">g</span>))</pre></div>
+      </div>
+    </div>
+
+    <!-- 21: TYPING -->
+    <div class="section" id="sec-typing">
+      <div class="section-eyebrow">21 · Ilg'or</div>
+      <h2 class="section-title">Typing — tur belgilash</h2>
+      <p class="section-desc">Type hints yordamida kodni tushunarli va xatosiz yozish.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">from</span> typing <span class="kw">import</span> List, Dict, Optional, Union, Any
+
+<span class="kw">def</span> <span class="fn">salom</span>(<span class="var">ism</span>: <span class="bi">str</span>, <span class="var">yosh</span>: <span class="bi">int</span>) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="kw">f</span><span class="str">"{ism} {yosh}"</span>
+
+<span class="kw">def</span> <span class="fn">ro_yxat</span>(<span class="var">lst</span>: List[<span class="bi">int</span>]) <span class="op">-&gt;</span> <span class="bi">int</span>:
+    <span class="kw">return</span> <span class="bi">sum</span>(<span class="var">lst</span>)
+
+<span class="kw">def</span> <span class="fn">lug_at</span>(<span class="var">d</span>: Dict[<span class="bi">str</span>, <span class="bi">int</span>]) <span class="op">-&gt;</span> <span class="kw">None</span>:
+    <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">optional</span>(<span class="var">x</span>: Optional[<span class="bi">str</span>] <span class="op">=</span> <span class="kw">None</span>) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="var">x</span> <span class="kw">or</span> <span class="str">"default"</span>
+
+<span class="kw">def</span> <span class="fn">union</span>(<span class="var">x</span>: Union[<span class="bi">int</span>, <span class="bi">str</span>]) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="bi">str</span>(<span class="var">x</span>)
+
+<span class="cm"># Python 3.10+ da qisqa yozuv</span>
+<span class="kw">def</span> <span class="fn">union2</span>(<span class="var">x</span>: <span class="bi">int</span> <span class="op">|</span> <span class="bi">str</span>) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="bi">str</span>(<span class="var">x</span>)
+
+<span class="kw">def</span> <span class="fn">istalgan</span>(<span class="var">x</span>: Any) <span class="op">-&gt;</span> Any:
+    <span class="kw">return</span> <span class="var">x</span></pre></div>
+      </div>
+    </div>
+
+    <!-- 22: COLLECTIONS -->
+    <div class="section" id="sec-collections">
+      <div class="section-eyebrow">22 · Ilg'or</div>
+      <h2 class="section-title">Collections</h2>
+      <p class="section-desc">Counter, defaultdict, OrderedDict, deque — maxsus ma'lumot tuzilmalari.</p>
+      <div class="code-wrap">
+        <div class="code-header"><span class="code-lang-badge">python</span><button class="copy-btn" onclick="copyCode(this)">Nusxa</button></div>
+        <div class="code-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> Counter, defaultdict, deque, OrderedDict
+
+<span class="cm"># Counter — elementlarni sanash</span>
+<span class="var">c</span> <span class="op">=</span> <span class="fn">Counter</span>(<span class="str">"abracadabra"</span>)
+<span class="var">c</span>.<span class="fn">most_common</span>(<span class="num">3</span>)       <span class="cm"># [('a',5),('b',2),('r',2)]</span>
+<span class="var">c</span>[<span class="str">"a"</span>]                  <span class="cm"># 5</span>
+<span class="var">c</span> <span class="op">+</span> <span class="fn">Counter</span>(<span class="str">"abc"</span>)     <span class="cm"># qo'shish</span>
+
+<span class="cm"># defaultdict — KeyError yo'q</span>
+<span class="var">dd</span> <span class="op">=</span> <span class="fn">defaultdict</span>(<span class="bi">list</span>)
+<span class="var">dd</span>[<span class="str">"meva"</span>].<span class="fn">append</span>(<span class="str">"olma"</span>)
+<span class="var">dd</span>[<span class="str">"meva"</span>].<span class="fn">append</span>(<span class="str">"banan"</span>)
+
+<span class="var">dd2</span> <span class="op">=</span> <span class="fn">defaultdict</span>(<span class="bi">int</span>)
+<span class="var">dd2</span>[<span class="str">"son"</span>] <span class="op">+=</span> <span class="num">1</span>          <span class="cm"># 0 dan boshlaydi</span>
+
+<span class="cm"># deque — tez qo'shish/o'chirish</span>
+<span class="var">d</span> <span class="op">=</span> <span class="fn">deque</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], maxlen<span class="op">=</span><span class="num">5</span>)
+<span class="var">d</span>.<span class="fn">append</span>(<span class="num">4</span>)             <span class="cm"># o'ngga</span>
+<span class="var">d</span>.<span class="fn">appendleft</span>(<span class="num">0</span>)        <span class="cm"># chapga</span>
+<span class="var">d</span>.<span class="fn">pop</span>()                 <span class="cm"># o'ngdan</span>
+<span class="var">d</span>.<span class="fn">popleft</span>()             <span class="cm"># chapdan</span>
+<span class="var">d</span>.<span class="fn">rotate</span>(<span class="num">1</span>)             <span class="cm"># aylantirish</span></pre></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+function show(id, el) {
+  // Sections
+  document.querySelectorAll('.section, .home-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('sec-' + id);
+  if (target) target.classList.add('active');
+
+  // Nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) {
+    el.classList.add('active');
+  } else {
+    const navEl = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+    if (navEl) navEl.classList.add('active');
+  }
+
+  // Mobile: close sidebar
+  if (window.innerWidth <= 768) {
+    document.querySelector('.sidebar').classList.remove('open');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Nusxa olindi!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Nusxa';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
